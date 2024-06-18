@@ -1,9 +1,14 @@
 function love.load()
 	world = love.physics.newWorld(0, 9.81*32)
-	sprites = love.graphics.newImage("static/assets/sprites/world_tileset.png")
+		world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
-	camera = require 'libraries/camera'
+	sprites = love.graphics.newImage("src/static/assets/sprites/world_tileset.png")
+
+	camera = require 'src/libraries/camera'
 	cam = camera()
+
+	text       = ""
+    persisting = 0
 
 	objects = {}
 
@@ -29,31 +34,52 @@ function love.load()
 	quadGrassTexturedGround1 = love.graphics.newQuad(16, 16, 16, 16, sprites)
 	quadGrassTexturedGround2 = love.graphics.newQuad(16, 0, 16, 16, sprites)
 
+	blocks = {}
+
+	blocks.block1 = {}
+
+	blocks.block1.x = 500
+	blocks.block1.y = 200
+	blocks.block1.width = 100
+	blocks.block1.height = 20
+	blocks.block1.body = love.physics.newBody(world, blocks.block1.x, blocks.block1.y)
+	blocks.block1.shape = love.physics.newRectangleShape(blocks.block1.width, blocks.block1.height)
+	blocks.block1.fixture = love.physics.newFixture(blocks.block1.body, blocks.block1.shape)
+
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
 
 function love.update(dt)
+	local distance, x1, y1, x2, y2 = love.physics.getDistance(objects.platform.fixture, player.fixture)
+	local onGround = y2 > y1 and true or false;
 	world:update(dt)
 
 	if love.keyboard.isDown("d") then
-		if love.keyboard.isDown("w") then
-			player.body:applyLinearImpulse(2, -2)
-		else
-			player.body:applyLinearImpulse(2, 0)
-		end
-	  elseif love.keyboard.isDown("a") then
-		if love.keyboard.isDown("w") then
-			player.body:applyLinearImpulse(-2, -2)
-		else
-			player.body:applyLinearImpulse(-2, 0)
-		end
-	elseif love.keyboard.isDown("r") then
+		player.body:applyLinearImpulse(10, 0)
+	end
+
+	if love.keyboard.isDown("a") then
+		player.body:applyLinearImpulse(-10, 0)
+	end
+
+	if love.keyboard.isDown("r") then
 		player.body:setPosition(player.x, player.y)
-	elseif love.keyboard.isDown("w") then
-		player.body:applyLinearImpulse(0, -10)
+	end
+
+	if love.keyboard.isDown("w") then
+		if y2 < y1 and not onGround then
+			player.body:applyLinearImpulse(0, 40)
+		else
+			player.body:applyLinearImpulse(0, -200)
+		end
 	end
 
 	cam:lookAt(player.body:getWorldPoints(player.shape:getPoints()))
+
+	--debugging
+	if string.len(text) > 768 then    -- cleanup when 'text' gets too long
+        text = ""
+    end
 end
 
 function love.draw()
@@ -79,5 +105,26 @@ function love.draw()
 		for i = -66, 100, 1 do
 			love.graphics.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
 		end
+
+		love.graphics.polygon("fill", blocks.block1.body:getWorldPoints(blocks.block1.shape:getPoints()))
 	cam:detach()
+
+	--- debugging
+	love.graphics.print(text, 10, 10)
+end
+
+function beginContact(a, b, coll)
+	
+end
+
+function endContact(a, b, coll)
+	
+end
+
+function preSolve(a, b, coll)
+	
+end
+
+function postSolve(a, b, coll, normalimpulse, tangentimpulse)
+	
 end
