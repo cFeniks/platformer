@@ -3,6 +3,7 @@ function love.load()
 		world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
 	sprites = love.graphics.newImage("src/static/assets/sprites/world_tileset.png")
+	fruitSprite = love.graphics.newImage("src/static/assets/sprites/fruit.png")
 
 	camera = require 'src/libraries/camera'
 	cam = camera()
@@ -13,6 +14,7 @@ function love.load()
 
 	objects.platform = {}
 
+	platformSprite = love.graphics.newImage("src/static/assets/sprites/platforms.png")
 	objects.platform.x = love.graphics.getWidth()
 	objects.platform.y = love.graphics.getHeight()
 	objects.platform.body = love.physics.newBody(world, objects.platform.x/2, objects.platform.y+100/2)
@@ -23,6 +25,7 @@ function love.load()
 	player = {}
 
 	canJump = false
+	jumpPower = -200
 	player.x = love.graphics.getWidth()/2
 	player.y = love.graphics.getHeight()/2
 	player.width = 32
@@ -32,16 +35,12 @@ function love.load()
 	player.fixture = love.physics.newFixture(player.body, player.shape, 1)
 	player.fixture:setUserData("Player")
 
-	quadGrassGround = love.graphics.newQuad(0, 0, 16, 16, sprites)
-	quadGrassTexturedGround1 = love.graphics.newQuad(16, 16, 16, 16, sprites)
-	quadGrassTexturedGround2 = love.graphics.newQuad(16, 0, 16, 16, sprites)
-
 	blocks = {}
 
 	blocks.block1 = {}
 
-	blocks.block1.x = 500
-	blocks.block1.y = 200
+	blocks.block1.x = 516
+	blocks.block1.y = 0
 	blocks.block1.width = 100
 	blocks.block1.height = 20
 	blocks.block1.body = love.physics.newBody(world, blocks.block1.x, blocks.block1.y)
@@ -52,7 +51,7 @@ function love.load()
 	blocks.block2 = {}
 
 	blocks.block2.x = 800
-	blocks.block2.y = 100
+	blocks.block2.y = -100
 	blocks.block2.width = 100
 	blocks.block2.height = 20
 	blocks.block2.body = love.physics.newBody(world, blocks.block2.x, blocks.block2.y)
@@ -63,7 +62,7 @@ function love.load()
 	blocks.block3 = {}
 
 	blocks.block3.x = 1200
-	blocks.block3.y = 50
+	blocks.block3.y = -20
 	blocks.block3.width = 200
 	blocks.block3.height = 200
 	blocks.block3.body = love.physics.newBody(world, blocks.block3.x, blocks.block3.y)
@@ -71,12 +70,30 @@ function love.load()
 	blocks.block3.fixture = love.physics.newFixture(blocks.block3.body, blocks.block3.shape)
 	blocks.block3.fixture:setUserData("Block3")
 
+	quadGrassGround = love.graphics.newQuad(0, 0, 16, 16, sprites)
+	quadGrassTexturedGround1 = love.graphics.newQuad(16, 16, 16, 16, sprites)
+	quadGrassTexturedGround2 = love.graphics.newQuad(16, 0, 16, 16, sprites)
+	quadPlatform = love.graphics.newQuad(0, 0, 16, 16, platformSprite)
+	quadFruit = love.graphics.newQuad(0, 0, 16, 16, fruitSprite)
+
+	fruitColl = false
+	fruits = {}
+	fruits.x = 607
+	fruits.y = 209
+	fruits.width = 16
+	fruits.height = 16
+	fruits.body = love.physics.newBody(world, fruits.x, fruits.y)
+	fruits.shape = love.physics.newRectangleShape(fruits.width, fruits.height)
+	fruits.fixture = love.physics.newFixture(fruits.body, fruits.shape)
+	fruits.fixture:setSensor(true)
+	fruits.fixture:setUserData("Apple")
+
+	drawFruit = true
+
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
 
 function love.update(dt)
-	local distance, x1, y1, x2, y2 = love.physics.getDistance(objects.platform.fixture, player.fixture)
-	
 	world:update(dt)
 
 	if love.keyboard.isDown("d") then
@@ -90,11 +107,12 @@ function love.update(dt)
 	if love.keyboard.isDown("r") then
 		player.body:setPosition(player.x, player.y)
 		player.body:applyLinearImpulse(0, 100)
+		love.load()
 	end
 
 	if love.keyboard.isDown("w") then
 		if canJump then
-			player.body:applyLinearImpulse(0, -200)
+			player.body:applyLinearImpulse(0, jumpPower)
 		end
 	end
 
@@ -107,10 +125,16 @@ function love.update(dt)
 end
 
 function love.draw()
+	
 	cam:attach()
+		if drawFruit then
+			love.graphics.polygon("fill", fruits.body:getWorldPoints(fruits.shape:getPoints()))
+			love.graphics.draw(fruitSprite, quadFruit, 600, 200)
+		end
 
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.polygon("fill", player.body:getWorldPoints(player.shape:getPoints()))
+		
 
 		-- love.graphics.polygon("fill", objects.platform.body:getWorldPoints(objects.platform.shape:getPoints()))
 		local height = objects.platform.y/2 + 50
@@ -130,10 +154,16 @@ function love.draw()
 			love.graphics.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
 		end
 
-		love.graphics.setColor(0.9, 0.31, 0.32)
-		love.graphics.polygon("fill", blocks.block1.body:getWorldPoints(blocks.block1.shape:getPoints()))
+		-- love.graphics.setColor(0.9, 0.31, 0.32)
+		for i = -1, 1 do
+			for j = -3, 2 do
+				love.graphics.draw(platformSprite, quadPlatform, blocks.block1.x + 16*j, blocks.block1.y + 10*i)
+			end
+		end
+		-- love.graphics.polygon("fill", blocks.block1.body:getWorldPoints(blocks.block1.shape:getPoints()))
 		love.graphics.polygon("fill", blocks.block2.body:getWorldPoints(blocks.block2.shape:getPoints()))
 		love.graphics.polygon("fill", blocks.block3.body:getWorldPoints(blocks.block3.shape:getPoints()))
+		
 	cam:detach()
 
 	-- debugging
@@ -144,7 +174,6 @@ end
 function beginContact(a, b, coll)
 	x,y = coll:getNormal()
 	local delta = 0.4
-	
 	if (y < 0 or (x >= 1-delta and x <= 1+delta) or (x >= -1-delta and x <= -1+delta))
 		and a:getUserData() ~= "Platform" then
 		canJump=false
@@ -152,13 +181,17 @@ function beginContact(a, b, coll)
 		canJump=true
 	end
 
+	if b:getUserData() == "Apple" then
+		fruits.body:destroy()
+		drawFruit=false
+	end
     text = text.."\n"..a:getUserData().." colliding with "..b:getUserData().." with a vector normal of: "..x..", "..y
 end
 
 function endContact(a, b, coll)
 	persisting = 0    -- reset since they're no longer touching
-	canJump=false
 
+	canJump=false
 	-- debugging
     text = text.."\n"..a:getUserData().." uncolliding with "..b:getUserData()
 end
