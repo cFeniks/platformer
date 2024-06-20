@@ -111,8 +111,9 @@ function love.update(dt)
 	end
 
 	if love.keyboard.isDown("w") then
-		if canJump then
-			player.body:applyLinearImpulse(0, jumpPower)
+		if canJump or fruitColl then
+			player.body:applyLinearImpulse(0, -200)
+			fruitColl = false
 		end
 	end
 
@@ -125,16 +126,12 @@ function love.update(dt)
 end
 
 function love.draw()
-	
 	cam:attach()
-		if drawFruit then
-			love.graphics.polygon("fill", fruits.body:getWorldPoints(fruits.shape:getPoints()))
+		if drawFruit then	
 			love.graphics.draw(fruitSprite, quadFruit, 600, 200)
 		end
-
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.polygon("fill", player.body:getWorldPoints(player.shape:getPoints()))
-		
 
 		-- love.graphics.polygon("fill", objects.platform.body:getWorldPoints(objects.platform.shape:getPoints()))
 		local height = objects.platform.y/2 + 50
@@ -182,21 +179,25 @@ function beginContact(a, b, coll)
 	end
 
 	if b:getUserData() == "Apple" then
+		fruitColl = true
 		fruits.body:destroy()
 		drawFruit=false
 	end
+
+	--debugging
     text = text.."\n"..a:getUserData().." colliding with "..b:getUserData().." with a vector normal of: "..x..", "..y
 end
 
 function endContact(a, b, coll)
 	persisting = 0    -- reset since they're no longer touching
-
 	canJump=false
+
 	-- debugging
     text = text.."\n"..a:getUserData().." uncolliding with "..b:getUserData()
 end
 
 function preSolve(a, b, coll)
+
 	-- debugging
 	if persisting == 0 then    -- only say when they first start touching
         text = text.."\n"..a:getUserData().." touching "..b:getUserData()
