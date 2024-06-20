@@ -76,8 +76,10 @@ function love.load()
 	quadPlatform = love.graphics.newQuad(0, 0, 16, 16, platformSprite)
 	quadFruit = love.graphics.newQuad(0, 0, 16, 16, fruitSprite)
 
-	fruitColl = false
 	fruits = {}
+
+	fruitColl = false
+	drawFruit = true
 	fruits.x = 607
 	fruits.y = 209
 	fruits.width = 16
@@ -87,8 +89,28 @@ function love.load()
 	fruits.fixture = love.physics.newFixture(fruits.body, fruits.shape)
 	fruits.fixture:setSensor(true)
 	fruits.fixture:setUserData("Apple")
+	
+	walls = {}
+	
+	walls.wallLeft = {}
+	walls.wallLeft.x = -objects.platform.x
+	walls.wallLeft.y = objects.platform.y/4
+	walls.wallLeft.width = 100
+	walls.wallLeft.height = 1000
+	walls.wallLeft.body = love.physics.newBody(world, walls.wallLeft.x, walls.wallLeft.y)
+	walls.wallLeft.shape = love.physics.newRectangleShape(walls.wallLeft.width, walls.wallLeft.height)
+	walls.wallLeft.fixture = love.physics.newFixture(walls.wallLeft.body, walls.wallLeft.shape)
+	walls.wallLeft.fixture:setUserData("wallLeft")
 
-	drawFruit = true
+	walls.wallRight = {}
+	walls.wallRight.x = objects.platform.x*2.2
+	walls.wallRight.y = objects.platform.y/4
+	walls.wallRight.width = 100
+	walls.wallRight.height = 1000
+	walls.wallRight.body = love.physics.newBody(world, walls.wallRight.x, walls.wallRight.y)
+	walls.wallRight.shape = love.physics.newRectangleShape(walls.wallRight.width, walls.wallRight.height)
+	walls.wallRight.fixture = love.physics.newFixture(walls.wallRight.body, walls.wallRight.shape)
+	walls.wallRight.fixture:setUserData("wallRight")
 
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
@@ -136,8 +158,8 @@ function love.draw()
 		-- love.graphics.polygon("fill", objects.platform.body:getWorldPoints(objects.platform.shape:getPoints()))
 		local height = objects.platform.y/2 + 50
 
-		for i = -66, 100, 1 do
-			for j = -66, 100, 1 do
+		for i = 1, 50, 1 do
+			for j = -66, 120, 1 do
 				if j % 2 == 0 or i % 2 == 0 or i + j % 3 == 0 then
 					love.graphics.draw(sprites, quadGrassTexturedGround2, 15*j, height)
 				else
@@ -147,7 +169,7 @@ function love.draw()
 			height = height+16
 		end
 
-		for i = -66, 100, 1 do
+		for i = -66, 120, 1 do
 			love.graphics.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
 		end
 
@@ -160,6 +182,8 @@ function love.draw()
 		-- love.graphics.polygon("fill", blocks.block1.body:getWorldPoints(blocks.block1.shape:getPoints()))
 		love.graphics.polygon("fill", blocks.block2.body:getWorldPoints(blocks.block2.shape:getPoints()))
 		love.graphics.polygon("fill", blocks.block3.body:getWorldPoints(blocks.block3.shape:getPoints()))
+		love.graphics.polygon("fill", walls.wallLeft.body:getWorldPoints(walls.wallLeft.shape:getPoints()))
+		love.graphics.polygon("fill", walls.wallRight.body:getWorldPoints(walls.wallRight.shape:getPoints()))
 		
 	cam:detach()
 
