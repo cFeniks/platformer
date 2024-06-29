@@ -14,6 +14,7 @@ function love.load()
 	
 	obj:load()
 
+	text1 = ""
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
 
@@ -46,15 +47,16 @@ function love.update(dt)
 	cam:lookAt(player.body:getWorldPoints(player.shape:getPoints()))
 
 	--debugging
-	if string.len(text) > 1200 then    -- cleanup when 'text' gets too long
-        text = ""
-    end
+	-- if string.len(text) > 1200 then    -- cleanup when 'text' gets too long
+    --     text = ""
+    -- end
+	text = ""
 end
 
 function love.draw()
 	cam:attach()
 	
-		if drawFruit then	
+		if drawFruit then
 			love.graphics.draw(fruitSprite, quadFruit, 600, 200)
 		end
 		love.graphics.setColor(1, 1, 1)
@@ -98,7 +100,17 @@ function love.draw()
 	-- debugging
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.print(text, 10, 10)
+	love.graphics.print(text1, 10, 10)
 end
+
+-- debugging
+function love.mousepressed(x, y, button, istouch)
+    player.body:setPosition(cam:mousePosition())
+	player.body:setLinearVelocity(0, 0)
+	player.body:setAngularVelocity(0, 0)
+
+	text1 = "clicked:   " .. "x: " .. x .. "  " .. "y: " .. y .."\n"
+ end
 
 function beginContact(a, b, coll)
 	x,y = coll:getNormal()
