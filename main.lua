@@ -17,6 +17,11 @@ function love.load()
 	
 	obj:load()
 
+	-- FPS lock for 60
+	min_dt = 1/60
+    next_time = love.timer.getTime()
+	--
+
 	text1 = ""
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
