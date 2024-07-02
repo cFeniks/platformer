@@ -27,6 +27,7 @@
                 player.body = love.physics.newBody(world, player.x, player.y, "dynamic")
                 player.shape = love.physics.newRectangleShape(player.width, player.height)
                 player.fixture = love.physics.newFixture(player.body, player.shape, 1)
+                player.body:setAngularDamping(0.5)
                 player.fixture:setUserData("Player")
 
 

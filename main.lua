@@ -66,6 +66,16 @@ function love.update(dt)
 		else
 			jumpPower=-300
 		end
+		
+	 end
+
+	local followVarX, followVarY = player.body:getX(), player.body:getY()
+	cam:lookAt(followVarX, followVarY)
+
+	if player.body:getX() < -590 then
+		cam:lockX(-590)
+	elseif player.body:getX() > 1415 then
+		cam:lockX(1415)
 	end
 
 	cam:lookAt(player.body:getWorldPoints(player.shape:getPoints()))
