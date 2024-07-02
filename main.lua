@@ -33,11 +33,11 @@ function love.update(dt)
 	player.body:setLinearDamping(0.5)
 
 	if love.keyboard.isDown("d") then
-		player.body:applyLinearImpulse(10, 0)
+		player.body:applyLinearImpulse(8, 0)
 	end
 
 	if love.keyboard.isDown("a") then
-		player.body:applyLinearImpulse(-10, 0)
+		player.body:applyLinearImpulse(-8, 0)
 	end
 
 	if love.keyboard.isDown("r") then
@@ -57,11 +57,11 @@ function love.update(dt)
 	end
 
 	if player.body:isTouching(objects.platform.body) and player.body:isTouching(walls.wallLeft.body) then
-		jumpPower=-150
+		jumpPower=-125
 		canJump=true
 	else
 		if player.body:isTouching(objects.platform.body) then
-			jumpPower=-150
+			jumpPower=-125
 			canJump=true
 		else
 			jumpPower=-300

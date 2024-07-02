@@ -27,7 +27,7 @@
                 player.body = love.physics.newBody(world, player.x, player.y, "dynamic")
                 player.shape = love.physics.newRectangleShape(player.width, player.height)
                 player.fixture = love.physics.newFixture(player.body, player.shape, 1)
-                player.body:setAngularDamping(0.5)
+                player.body:setAngularDamping(2)
                 player.fixture:setUserData("Player")
 
 
@@ -91,8 +91,8 @@
 
                 blocks.block6 = {}
 
-                    blocks.block6.x = -100
-                    blocks.block6.y = -270
+                    blocks.block6.x = -80
+                    blocks.block6.y = -280
                     blocks.block6.width = 10
                     blocks.block6.height = 10
                     blocks.block6.body = love.physics.newBody(world, blocks.block6.x, blocks.block6.y)
@@ -102,7 +102,7 @@
 
                 blocks.block7 = {}
 
-                    blocks.block7.x = 200
+                    blocks.block7.x = 180
                     blocks.block7.y = -350
                     blocks.block7.width = 10
                     blocks.block7.height = 10
@@ -113,7 +113,7 @@
 
                 blocks.block8 = {}
 
-                    blocks.block8.x = 700
+                    blocks.block8.x = 680
                     blocks.block8.y = -400
                     blocks.block8.width = 100
                     blocks.block8.height = 20
