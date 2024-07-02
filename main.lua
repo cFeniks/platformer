@@ -157,6 +157,15 @@ function love.draw()
 		-- love.graphics.polygon("fill", fruits.fruit3.body:getWorldPoints(fruits.fruit3.shape:getPoints()))
 	cam:detach()
 
+	-- FPS lock
+	local cur_time = love.timer.getTime()
+   	if next_time <= cur_time then
+      	next_time = cur_time
+      	return
+   	end
+   	love.timer.sleep(next_time - cur_time)
+   	--
+
 	-- debugging
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.print(text, 10, 10)
