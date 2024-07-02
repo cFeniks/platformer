@@ -78,8 +78,6 @@ function love.update(dt)
 		cam:lockX(1415)
 	end
 
-	cam:lookAt(player.body:getWorldPoints(player.shape:getPoints()))
-
 	--debugging
 	-- if string.len(text) > 1200 then    -- cleanup when 'text' gets too long
     --     text = ""
@@ -139,8 +137,8 @@ function love.draw()
 		love.graphics.polygon("fill", blocks.block7.body:getWorldPoints(blocks.block7.shape:getPoints()))
 		love.graphics.polygon("fill", blocks.block8.body:getWorldPoints(blocks.block8.shape:getPoints()))
 
-		love.graphics.polygon("fill", walls.wallLeft.body:getWorldPoints(walls.wallLeft.shape:getPoints()))
-		love.graphics.polygon("fill", walls.wallRight.body:getWorldPoints(walls.wallRight.shape:getPoints()))
+		-- love.graphics.polygon("fill", walls.wallLeft.body:getWorldPoints(walls.wallLeft.shape:getPoints()))
+		-- love.graphics.polygon("fill", walls.wallRight.body:getWorldPoints(walls.wallRight.shape:getPoints()))
 		
 		-- love.graphics.polygon("fill", fruits.fruit3.body:getWorldPoints(fruits.fruit3.shape:getPoints()))
 	cam:detach()
