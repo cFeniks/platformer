@@ -78,6 +78,15 @@ function love.update(dt)
 		cam:lockX(1415)
 	end
 
+	-- FPS lock
+	local cur_time = love.timer.getTime()
+   	if next_time <= cur_time then
+      	next_time = cur_time
+      	return
+   	end
+   	love.timer.sleep(next_time - cur_time)
+   	--
+
 	--debugging
 	-- if string.len(text) > 1200 then    -- cleanup when 'text' gets too long
     --     text = ""
