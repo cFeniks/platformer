@@ -27,6 +27,7 @@
                 player.body = love.physics.newBody(world, player.x, player.y, "dynamic")
                 player.shape = love.physics.newRectangleShape(player.width, player.height)
                 player.fixture = love.physics.newFixture(player.body, player.shape, 1)
+                player.body:setLinearDamping(0.5)
                 player.fixture:setUserData("Player")
 
 
@@ -179,8 +180,8 @@
                 lastCollision = ""
             
                 walls.wallLeft = {}
-                walls.wallLeft.x = -objects.platform.x
-                walls.wallLeft.y = objects.platform.y/4
+                walls.wallLeft.x = -objects.platform.x*1.3
+                walls.wallLeft.y = objects.platform.y/16-100
                 walls.wallLeft.width = 100
                 walls.wallLeft.height = 1000
                 walls.wallLeft.body = love.physics.newBody(world, walls.wallLeft.x, walls.wallLeft.y)
@@ -189,8 +190,8 @@
                 walls.wallLeft.fixture:setUserData("wallLeft")
 
                 walls.wallRight = {}
-                walls.wallRight.x = objects.platform.x*2.2
-                walls.wallRight.y = objects.platform.y/4
+                walls.wallRight.x = objects.platform.x*2.33
+                walls.wallRight.y = objects.platform.y/16-100
                 walls.wallRight.width = 100
                 walls.wallRight.height = 1000
                 walls.wallRight.body = love.physics.newBody(world, walls.wallRight.x, walls.wallRight.y)

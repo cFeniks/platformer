@@ -18,19 +18,25 @@ function love.load()
 	obj:load()
 
 	text1 = ""
+
+	-- FPS lock for 60
+	min_dt = 1/60
+    next_time = love.timer.getTime()
+	--
+
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
 
 function love.update(dt)
-	world:update(dt)
+	next_time = next_time + min_dt -- FPS
+
+		world:update(dt)
 	if doTimer then
 		time = time + dt
 		text1 = time
 	else
 		text1 = time
 	end
-
-	player.body:setLinearDamping(0.5)
 
 	if love.keyboard.isDown("d") then
 		player.body:applyLinearImpulse(10, 0)
@@ -57,18 +63,28 @@ function love.update(dt)
 	end
 
 	if player.body:isTouching(objects.platform.body) and player.body:isTouching(walls.wallLeft.body) then
-		jumpPower=-150
+		jumpPower=-125
 		canJump=true
 	else
 		if player.body:isTouching(objects.platform.body) then
-			jumpPower=-150
+			jumpPower=-125
 			canJump=true
 		else
 			jumpPower=-300
 		end
-	end
+		
+	 end
 
-	cam:lookAt(player.body:getWorldPoints(player.shape:getPoints()))
+	
+	if player.body:getX() < -580 then
+		cam:lockX(-590, camera.smooth.damped(15))
+	elseif player.body:getX() > 1410 then
+		cam:lockX(1415, camera.smooth.damped(15))
+	else
+		
+		cam:lookAt(player.body:getWorldPoints(player.shape:getPoints()))
+	end
+	
 
 	--debugging
 	-- if string.len(text) > 1200 then    -- cleanup when 'text' gets too long
@@ -129,8 +145,8 @@ function love.draw()
 		love.graphics.polygon("fill", blocks.block7.body:getWorldPoints(blocks.block7.shape:getPoints()))
 		love.graphics.polygon("fill", blocks.block8.body:getWorldPoints(blocks.block8.shape:getPoints()))
 
-		love.graphics.polygon("fill", walls.wallLeft.body:getWorldPoints(walls.wallLeft.shape:getPoints()))
-		love.graphics.polygon("fill", walls.wallRight.body:getWorldPoints(walls.wallRight.shape:getPoints()))
+		-- love.graphics.polygon("fill", walls.wallLeft.body:getWorldPoints(walls.wallLeft.shape:getPoints()))
+		-- love.graphics.polygon("fill", walls.wallRight.body:getWorldPoints(walls.wallRight.shape:getPoints()))
 		
 		-- love.graphics.polygon("fill", fruits.fruit3.body:getWorldPoints(fruits.fruit3.shape:getPoints()))
 	cam:detach()
@@ -140,6 +156,15 @@ function love.draw()
 	love.graphics.print(text, 10, 10)
 	love.graphics.print(text1, 10, 10)
 	love.window.setTitle(tostring(love.timer.getFPS()))
+
+	-- FPS lock
+	local cur_time = love.timer.getTime()
+   	if next_time <= cur_time then
+      	next_time = cur_time
+      	return
+   	end
+   	love.timer.sleep(next_time - cur_time)
+   	--
 end
 
 -- debugging feature
