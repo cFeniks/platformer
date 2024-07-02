@@ -27,6 +27,9 @@ function love.load()
 end
 
 function love.update(dt)
+
+	next_time = next_time + min_dt -- FPS
+
 	world:update(dt)
 	if doTimer then
 		time = time + dt
@@ -82,15 +85,6 @@ function love.update(dt)
 	elseif player.body:getX() > 1415 then
 		cam:lockX(1415)
 	end
-
-	-- FPS lock
-	local cur_time = love.timer.getTime()
-   	if next_time <= cur_time then
-      	next_time = cur_time
-      	return
-   	end
-   	love.timer.sleep(next_time - cur_time)
-   	--
 
 	--debugging
 	-- if string.len(text) > 1200 then    -- cleanup when 'text' gets too long
