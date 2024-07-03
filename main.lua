@@ -23,6 +23,7 @@ function love.load()
 	--
 
 	text1 = ""
+	text2 = ""
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
 
@@ -111,7 +112,6 @@ function love.draw()
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.polygon("fill", player.body:getWorldPoints(player.shape:getPoints()))
 
-		-- love.graphics.polygon("fill", objects.platform.body:getWorldPoints(objects.platform.shape:getPoints()))
 		local height = objects.platform.y/2 + 50
 
 		for i = 1, 50, 1 do
@@ -129,28 +129,11 @@ function love.draw()
 			love.graphics.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
 		end
 
-		-- love.graphics.setColor(0.1, 0.51, 0.32)
-		-- for i = -1, 1 do
-		-- 	for j = -3, 2 do
-		-- 		love.graphics.draw(platformSprite, quadPlatform, blocks.block1.x + 16*j, blocks.block1.y + 10*i)
-		-- 	end
-		-- end
-		love.graphics.polygon("fill", blocks.block1.body:getWorldPoints(blocks.block1.shape:getPoints()))
-
-		love.graphics.polygon("fill", blocks.block2.body:getWorldPoints(blocks.block2.shape:getPoints()))
-		love.graphics.polygon("fill", blocks.block3.body:getWorldPoints(blocks.block3.shape:getPoints()))
-		love.graphics.polygon("fill", blocks.block4.body:getWorldPoints(blocks.block4.shape:getPoints()))
-		love.graphics.polygon("fill", blocks.block5.body:getWorldPoints(blocks.block5.shape:getPoints()))
-		love.graphics.polygon("fill", blocks.block6.body:getWorldPoints(blocks.block6.shape:getPoints()))
-		love.graphics.polygon("fill", blocks.block7.body:getWorldPoints(blocks.block7.shape:getPoints()))
-		love.graphics.polygon("fill", blocks.block8.body:getWorldPoints(blocks.block8.shape:getPoints()))
-
-		-- love.graphics.polygon("fill", walls.wallLeft.body:getWorldPoints(walls.wallLeft.shape:getPoints()))
-		-- love.graphics.polygon("fill", walls.wallRight.body:getWorldPoints(walls.wallRight.shape:getPoints()))
-		
-		-- love.graphics.polygon("fill", fruits.fruit3.body:getWorldPoints(fruits.fruit3.shape:getPoints()))
+		for _, block in pairs(blocks) do
+			love.graphics.polygon("fill", block.body:getWorldPoints(block.shape:getPoints()))
+		end
 	cam:detach()
-
+	
 	-- FPS lock
 	local cur_time = love.timer.getTime()
    	if next_time <= cur_time then
@@ -164,6 +147,7 @@ function love.draw()
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.print(text, 10, 10)
 	love.graphics.print(text1, 10, 10)
+	love.graphics.print(text2, 100, 100)
 	love.window.setTitle(tostring(love.timer.getFPS()))
 end
 
