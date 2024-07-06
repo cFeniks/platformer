@@ -141,7 +141,7 @@
                 walls[1].x = -objects.platform.x*1.3
 
                 walls[2] = {}
-                walls[2].x = objects.platform.x*2.33
+                walls[2].x = objects.platform.x*2.313
 
                 for i=1, tablelength(walls) do
                     local wall = walls[i]

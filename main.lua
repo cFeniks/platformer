@@ -30,10 +30,10 @@ function love.load()
 end
 
 function love.update(dt)
+	world:update(dt)
 
 	next_time = next_time + min_dt -- FPS
 
-	world:update(dt)
 	if doTimer then
 		time = time + dt
 		text1 = time
@@ -67,26 +67,22 @@ function love.update(dt)
 		end
 	end
 
-	if player.body:isTouching(objects.platform.body) and player.body:isTouching(walls[1].body) then
+	if player.body:isTouching(objects.platform.body) then
 		jumpPower=-125
 		canJump=true
 	else
-		if player.body:isTouching(objects.platform.body) then
-			jumpPower=-125
-			canJump=true
-		else
-			jumpPower=-300
-		end
+		jumpPower=-300
 		
-	 end
+	end
 
+    -- camera movement 
 	local followVarX, followVarY = player.body:getX(), player.body:getY()
 	cam:lookAt(followVarX, followVarY)
 
 	if player.body:getX() < -590 then
 		cam:lockX(-590)
-	elseif player.body:getX() > 1415 then
-		cam:lockX(1415)
+	elseif player.body:getX() > 1400 then
+		cam:lockX(1400)
 	end
 
 	--debugging
@@ -109,22 +105,25 @@ function love.draw()
 		g.setColor(1, 1, 1)
 		g.polygon("fill", player.body:getWorldPoints(player.shape:getPoints()))
 
-		local height = objects.platform.y/2 + 50
+		g.polygon("fill", objects.platform.body:getWorldPoints(objects.platform.shape:getPoints()))
 
-		for i = 1, 50, 1 do
-			for j = -66, 120, 1 do
-				if j % 2 == 0 or i % 2 == 0 or i + j % 3 == 0 then
-					g.draw(sprites, quadGrassTexturedGround2, 15*j, height)
-				else
-					g.draw(sprites, quadGrassTexturedGround1, 15*j, height)
-				end
-			end
-			height = height+16
-		end
+		-- ground
 
-		for i = -66, 120, 1 do
-			g.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
-		end
+		-- local height = objects.platform.y/2 + 50
+
+		-- for i = 1, 50, 1 do
+		-- 	for j = -66, 120, 1 do
+		-- 		if j % 2 == 0 or i % 2 == 0 or i + j % 3 == 0 then
+		-- 			g.draw(sprites, quadGrassTexturedGround2, 15*j, height)
+		-- 		else
+		-- 			g.draw(sprites, quadGrassTexturedGround1, 15*j, height)
+		-- 		end
+		-- 	end
+		-- 	height = height+16
+		-- end
+		-- for i = -66, 120, 1 do
+		-- 	g.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
+		-- end
 
 		for i = 1, tablelength(blocks) do
 			g.polygon("fill", blocks[i].body:getWorldPoints(blocks[i].shape:getPoints()))
@@ -139,7 +138,7 @@ function love.draw()
       	return
    	end
    	love.timer.sleep(next_time - cur_time)
-   	--
+
 
 	-- debugging
 	g.setColor(1, 1, 1)
@@ -150,13 +149,13 @@ function love.draw()
 end
 
 -- debugging feature
-function love.mousepressed(x, y, button, istouch)
-    player.body:setPosition(cam:mousePosition())
-	player.body:setLinearVelocity(0, 0)
-	player.body:setAngularVelocity(0, 0)
+-- function love.mousepressed(x, y, button, istouch)
+--     player.body:setPosition(cam:mousePosition())
+-- 	player.body:setLinearVelocity(0, 0)
+-- 	player.body:setAngularVelocity(0, 0)
 
-	text1 = "clicked:   " .. "x: " .. x .. "  " .. "y: " .. y .."\n"
-end
+-- 	text1 = "clicked:   " .. "x: " .. x .. "  " .. "y: " .. y .."\n"
+-- end
 
 function beginContact(a, b, coll)
 	x,y = coll:getNormal()
@@ -186,8 +185,6 @@ function beginContact(a, b, coll)
 end
 
 function endContact(a, b, coll)
-	lastCollision = b:getUserData()
-
 	persisting = 0    -- reset since they're no longer touching
 	canJump=false
 
@@ -207,7 +204,4 @@ function preSolve(a, b, coll)
 end
 
 function postSolve(a, b, coll, normalimpulse, tangentimpulse)
-	if b:getUserData() == "Platform" and (lastCollision == "wallLeft" or lastCollision == "wallRight") then
-		canJump = true
-	end
 end
