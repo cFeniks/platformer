@@ -1,10 +1,12 @@
 local obj = require ("objects")
 function love.load()
+	g = love.graphics
+
 	world = love.physics.newWorld(0, 9.81*32, true)
 		world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
-	sprites = love.graphics.newImage("src/static/assets/sprites/world_tileset.png")
-	fruitSprite = love.graphics.newImage("src/static/assets/sprites/fruit.png")
+	sprites = g.newImage("src/static/assets/sprites/world_tileset.png")
+	fruitSprite = g.newImage("src/static/assets/sprites/fruit.png")
 
 	camera = require 'src/libraries/camera'
 	cam = camera()
@@ -25,14 +27,14 @@ function love.load()
 	text1 = ""
 	text2 = ""
 	help = "Press R to Restart\nUse arrows to move"
-	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
+	g.setBackgroundColor(0.1, 0.1, 0.1)
 end
 
 function love.update(dt)
+	world:update(dt)
 
 	next_time = next_time + min_dt -- FPS
 
-	world:update(dt)
 	if doTimer then
 		time = time + dt
 		text1 = time
@@ -66,26 +68,22 @@ function love.update(dt)
 		end
 	end
 
-	if player.body:isTouching(objects.platform.body) and player.body:isTouching(walls.wallLeft.body) then
+	if player.body:isTouching(objects.platform.body) then
 		jumpPower=-125
 		canJump=true
 	else
-		if player.body:isTouching(objects.platform.body) then
-			jumpPower=-125
-			canJump=true
-		else
-			jumpPower=-300
-		end
+		jumpPower=-300
 		
-	 end
+	end
 
+    -- camera movement 
 	local followVarX, followVarY = player.body:getX(), player.body:getY()
 	cam:lookAt(followVarX, followVarY)
 
 	if player.body:getX() < -590 then
 		cam:lockX(-590)
-	elseif player.body:getX() > 1415 then
-		cam:lockX(1415)
+	elseif player.body:getX() > 1400 then
+		cam:lockX(1400)
 	end
 
 	--debugging
@@ -97,42 +95,41 @@ end
 
 function love.draw()
 	cam:attach()
-	
-		if drawFruit1 then
-			love.graphics.draw(fruitSprite, quadFruit, 600, 200)
-		end
 
-		if drawFruit2 then
-			love.graphics.draw(fruitSprite, quadFruit, -293, -250)
-		end
-
-		if drawFruit3 then
-			love.graphics.draw(fruitSprite, quadFruit, 300, -470)
-		end
-
-		love.graphics.setColor(1, 1, 1)
-		love.graphics.polygon("fill", player.body:getWorldPoints(player.shape:getPoints()))
-
-		local height = objects.platform.y/2 + 50
-
-		for i = 1, 50, 1 do
-			for j = -66, 120, 1 do
-				if j % 2 == 0 or i % 2 == 0 or i + j % 3 == 0 then
-					love.graphics.draw(sprites, quadGrassTexturedGround2, 15*j, height)
-				else
-					love.graphics.draw(sprites, quadGrassTexturedGround1, 15*j, height)
-				end
+		for i=1, tablelength(fruits) do
+			local fruit = fruits[i].draw
+			if fruit then
+				g.draw(fruitSprite, quadFruit, fruits[i].x - 8, fruits[i].y - 10)
 			end
-			height = height+16
 		end
 
-		for i = -66, 120, 1 do
-			love.graphics.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
-		end
+		g.setColor(1, 1, 1)
+		g.polygon("fill", player.body:getWorldPoints(player.shape:getPoints()))
 
-		for _, block in pairs(blocks) do
-			love.graphics.polygon("fill", block.body:getWorldPoints(block.shape:getPoints()))
+		g.polygon("fill", objects.platform.body:getWorldPoints(objects.platform.shape:getPoints()))
+
+		-- ground
+
+		-- local height = objects.platform.y/2 + 50
+
+		-- for i = 1, 50, 1 do
+		-- 	for j = -66, 120, 1 do
+		-- 		if j % 2 == 0 or i % 2 == 0 or i + j % 3 == 0 then
+		-- 			g.draw(sprites, quadGrassTexturedGround2, 15*j, height)
+		-- 		else
+		-- 			g.draw(sprites, quadGrassTexturedGround1, 15*j, height)
+		-- 		end
+		-- 	end
+		-- 	height = height+16
+		-- end
+		-- for i = -66, 120, 1 do
+		-- 	g.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
+		-- end
+
+		for i = 1, tablelength(blocks) do
+			g.polygon("fill", blocks[i].body:getWorldPoints(blocks[i].shape:getPoints()))
 		end
+		
 	cam:detach()
 	
 	-- FPS lock
@@ -142,19 +139,19 @@ function love.draw()
       	return
    	end
    	love.timer.sleep(next_time - cur_time)
-   	--
+
 
 	-- debugging
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.print(text, 10, 10)
+	g.setColor(1, 1, 1)
+	g.print(text, 10, 10)
 	love.graphics.print(help, 0, 100)
 	if not doTimer then
 		text1 = "You've finished the game in:  " .. time .. "s";
 	else
 		love.graphics.print(text1, 10, 10)
 	end
-	love.graphics.print(text1, 10, 10)
-	love.graphics.print(text2, 100, 100)
+	g.print(text1, 10, 10)
+	g.print(text2, 100, 100)
 	love.window.setTitle(tostring(love.timer.getFPS()))
 end
 
@@ -182,28 +179,12 @@ function beginContact(a, b, coll)
 		doTimer = false
 	end
 
-	if b:getUserData() == "wallLeft" or b:getUserData() == "wallRight" then
-		if (lastCollision == "wallLeft" or lastCollision == "wallRight")  then
-			canJump = false
-			end
-	end
-
-	if b:getUserData() == "Apple1" then
-		fruitColl = true
-		fruits.fruit1.body:destroy()
-		drawFruit1=false
-	end
-
-	if b:getUserData() == "Apple2" then
-		fruitColl = true
-		fruits.fruit2.body:destroy()
-		drawFruit2=false
-	end
-
-	if b:getUserData() == "Apple3" then
-		fruitColl = true
-		fruits.fruit3.body:destroy()
-		drawFruit3=false
+	for i=1, tablelength(fruits) do
+		if b:getUserData() == "Apple"..i then
+			fruitColl = true
+			fruits[i].body:destroy()
+			fruits[i].draw=false
+		end
 	end
 
 	--debugging
@@ -211,8 +192,6 @@ function beginContact(a, b, coll)
 end
 
 function endContact(a, b, coll)
-	lastCollision = b:getUserData()
-
 	persisting = 0    -- reset since they're no longer touching
 	canJump=false
 
@@ -228,14 +207,8 @@ function preSolve(a, b, coll)
     elseif persisting < 20 then    -- then just start counting
         text = text.." "..persisting
     end
-
-	
-
     persisting = persisting + 1    -- keep track of how many updates they've been touching for
 end
 
 function postSolve(b)
-	if b:getUserData() == "Platform" and (lastCollision == "wallLeft" or lastCollision == "wallRight") then
-		canJump = true
-	end
 end
