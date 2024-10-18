@@ -24,6 +24,7 @@ function love.load()
 
 	text1 = ""
 	text2 = ""
+	help = "Press R to Restart\nUse arrows to move"
 	love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 end
 
@@ -41,11 +42,11 @@ function love.update(dt)
 
 	player.body:setLinearDamping(0.5)
 
-	if love.keyboard.isDown("d") then
+	if love.keyboard.isDown("right") then
 		player.body:applyLinearImpulse(8, 0)
 	end
 
-	if love.keyboard.isDown("a") then
+	if love.keyboard.isDown("left") then
 		player.body:applyLinearImpulse(-8, 0)
 	end
 
@@ -56,7 +57,7 @@ function love.update(dt)
 		love.load()
 	end
 
-	if love.keyboard.isDown("w") then
+	if love.keyboard.isDown("up") then
 		if canJump or fruitColl then
 			player.body:applyLinearImpulse(0, jumpPower)
 			fruitColl = false
@@ -146,19 +147,25 @@ function love.draw()
 	-- debugging
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.print(text, 10, 10)
+	love.graphics.print(help, 0, 100)
+	if not doTimer then
+		text1 = "You've finished the game in:  " .. time .. "s";
+	else
+		love.graphics.print(text1, 10, 10)
+	end
 	love.graphics.print(text1, 10, 10)
 	love.graphics.print(text2, 100, 100)
 	love.window.setTitle(tostring(love.timer.getFPS()))
 end
 
 -- debugging feature
--- function love.mousepressed(x, y, button, istouch)
---     player.body:setPosition(cam:mousePosition())
--- 	player.body:setLinearVelocity(0, 0)
--- 	player.body:setAngularVelocity(0, 0)
+function love.mousepressed(x, y, button, istouch)
+    player.body:setPosition(cam:mousePosition())
+	player.body:setLinearVelocity(0, 0)
+	player.body:setAngularVelocity(0, 0)
 
--- 	text1 = "clicked:   " .. "x: " .. x .. "  " .. "y: " .. y .."\n"
--- end
+	text1 = "clicked:   " .. "x: " .. x .. "  " .. "y: " .. y .."\n"
+end
 
 function beginContact(a, b, coll)
 	x,y = coll:getNormal()
@@ -171,8 +178,8 @@ function beginContact(a, b, coll)
 	end
 
 	if b:getUserData() == "Block8" then
+		text1 = "";
 		doTimer = false
-		text1 = time
 	end
 
 	if b:getUserData() == "wallLeft" or b:getUserData() == "wallRight" then
@@ -227,7 +234,7 @@ function preSolve(a, b, coll)
     persisting = persisting + 1    -- keep track of how many updates they've been touching for
 end
 
-function postSolve(a, b, coll, normalimpulse, tangentimpulse)
+function postSolve(b)
 	if b:getUserData() == "Platform" and (lastCollision == "wallLeft" or lastCollision == "wallRight") then
 		canJump = true
 	end
