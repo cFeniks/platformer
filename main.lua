@@ -110,21 +110,21 @@ function love.draw()
 
 		-- ground
 
-		-- local height = objects.platform.y/2 + 50
+		local height = objects.platform.y/2 + 50
 
-		-- for i = 1, 50, 1 do
-		-- 	for j = -66, 120, 1 do
-		-- 		if j % 2 == 0 or i % 2 == 0 or i + j % 3 == 0 then
-		-- 			g.draw(sprites, quadGrassTexturedGround2, 15*j, height)
-		-- 		else
-		-- 			g.draw(sprites, quadGrassTexturedGround1, 15*j, height)
-		-- 		end
-		-- 	end
-		-- 	height = height+16
-		-- end
-		-- for i = -66, 120, 1 do
-		-- 	g.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
-		-- end
+		for i = 1, 50, 1 do
+			for j = -66, 120, 1 do
+				if j % 2 == 0 or i % 2 == 0 or i + j % 3 == 0 then
+					g.draw(sprites, quadGrassTexturedGround2, 15*j, height)
+				else
+					g.draw(sprites, quadGrassTexturedGround1, 15*j, height)
+				end
+			end
+			height = height+16
+		end
+		for i = -66, 120, 1 do
+			g.draw(sprites, quadGrassGround, 15*i, objects.platform.y/2 + 50)
+		end
 
 		for i = 1, tablelength(blocks) do
 			g.polygon("fill", blocks[i].body:getWorldPoints(blocks[i].shape:getPoints()))
